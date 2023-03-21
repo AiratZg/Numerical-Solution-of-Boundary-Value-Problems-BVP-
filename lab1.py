@@ -7,50 +7,36 @@
 """
 
 
-import math
 import numpy as np
 import matplotlib.pyplot as plt
+from math import exp
 from prettytable import PrettyTable
 from numpy import arange
 
-flag_ten = 1
-while (True):
-    if flag_ten:
-        print(
-            "Краевая задача вида: \n -p(x) * y'' + q(x) * y' + r(x) * y = f(x), a<=x<=b, "
-            "\n alpha_1 * y(a) - alpha_2 * y'(a) = alpha, "
-            "\n beta_1 * y(b) + beta_2 * y'(b) = beta. Численное решение представляет порядок точности O(h).")
-        ALPHA = 4.0
-        BETA = 2.0 * math.exp(1)
-        N = 8
-        b = 1.0
-        a = 0.0
-        h = (b - a) / N
-        p = -1.0
-        q = 1.0
-        r = -3.0
-        ALPHA_1 = 1.0
-        ALPHA_2 = -1.0
-        BETA_1 = 1.0
-        BETA_2 = 1.0
-        exact_solution_temp = np.linspace(a - h / 2, b + h / 2, 100)
-        EXACT_SOLUTION = [(x - 1) ** 3 + math.exp(x) for x in exact_solution_temp]
-        X_I_extended = list(arange(a - h / 2, b + h / 2 + h, h))
-        P_I = [p for x in X_I_extended]
-        Q_I = [x - 1 for x in X_I_extended]
-        R_I = [r for x in X_I_extended]
-        F_I = [6 * (x - 1) + (x - 3) * math.exp(x) for x in X_I_extended]
-        A = [0.0]
-        C = [ALPHA_1 / 2 - ALPHA_2 / h]
-        B = [-(ALPHA_1 / 2 + ALPHA_2 / h)]
-        s = [C[0] / B[0]]
-        G = [ALPHA]
-        t = [-G[0] / B[0]]
-        y_exact = [(x - 1) ** 3 + math.exp(x) for x in X_I_extended]
-        flag_ten = True
-        break
-    else:
-        break
+ALPHA = 4.0
+BETA = 2.0 * exp(1)
+N = 8
+NUM_B = 1.0
+NUM_A = 0.0
+NUM_H = (NUM_B - NUM_A) / N
+ALPHA_1 = 1.0
+ALPHA_2 = -1.0
+BETA_1 = 1.0
+BETA_2 = 1.0
+exact_solution_temp = np.linspace(NUM_A - NUM_H / 2, NUM_B + NUM_H / 2, 100)
+EXACT_SOLUTION = [(x - 1) ** 3 + exp(x) for x in exact_solution_temp]
+X_I_extended = list(arange(NUM_A - NUM_H / 2, NUM_B + NUM_H/2+NUM_H, NUM_H))
+P_I = [-1.0 for _ in X_I_extended]
+Q_I = [x - 1 for x in X_I_extended]
+R_I = [-3.0 for _ in X_I_extended]
+F_I = [6 * (x - 1) + (x - 3) * exp(x) for x in X_I_extended]
+A = [0.0]
+C = [ALPHA_1 / 2 - ALPHA_2 / NUM_H]
+B = [-(ALPHA_1 / 2 + ALPHA_2 / NUM_H)]
+s = [C[0] / B[0]]
+G = [ALPHA]
+t = [-G[0] / B[0]]
+y_exact = [(x - 1) ** 3 + exp(x) for x in X_I_extended]
 
 
 def print_table(field_names, row):
@@ -81,11 +67,8 @@ def error(y_i_approximate):
 
 def build_graph(graph_name, y_i_approximate):
     """Строим графики"""
-    exact_solution_array = np.linspace(a - h / 2, b + h / 2, 100)
-    if flag_ten:
-        schedule_exact = EXACT_SOLUTION
-    else:
-        schedule_exact = [eval(EXACT_SOLUTION) for _ in exact_solution_array]
+    exact_solution_array = np.linspace(NUM_A-NUM_H/2, NUM_B+NUM_H/2, 100)
+    schedule_exact = EXACT_SOLUTION
     plt.title(graph_name)
     plt.plot(exact_solution_array, schedule_exact)
     plt.scatter(X_I_extended, y_i_approximate)
@@ -95,12 +78,12 @@ def build_graph(graph_name, y_i_approximate):
 def second_order_approximation():
     """Аппроксимация второго порядка, метод прогонки"""
     for i in range(1, N + 1):
-        A.append(-P_I[i] / h ** 2 - Q_I[i] / (2 * h))
-        C.append(-P_I[i] / h ** 2 + Q_I[i] / (2 * h))
-        B.append(-2 * P_I[i] / h ** 2 - R_I[i])
-    A.append(BETA_1 / 2 - BETA_2 / h)
+        A.append(-P_I[i] / NUM_H ** 2 - Q_I[i] / (2 * NUM_H))
+        C.append(-P_I[i] / NUM_H ** 2 + Q_I[i] / (2 * NUM_H))
+        B.append(-2 * P_I[i] / NUM_H ** 2 - R_I[i])
+    A.append(BETA_1 / 2 - BETA_2 / NUM_H)
     C.append(0.0)
-    B.append(-(BETA_1 / 2 + BETA_2 / h))
+    B.append(-(BETA_1 / 2 + BETA_2 / NUM_H))
     for i in range(1, N + 1):
         s.append(C[i] / (B[i] - A[i] * s[i - 1]))
     s.append(0.0)
